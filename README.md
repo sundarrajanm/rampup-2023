@@ -10,6 +10,6 @@ As a 2023 ramp up activity, the following shall be accomplished:
 * Build a representative UI application using Vue.js that will consume these APIs with
   testablity & telemetry (like clickstream, errors reporting etc) aspects covered.
 * Demonstrate a simple CI/CD pipepline for the ecosystem that promotes everyday or more
-  frequent deployments ensuring engineering efficiency is measured through DORA metrics.
+  frequent deployments ensuring engineering efficiency is measured through [DORA](https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance) metrics.
 * Apply machine learning algorithms in the ecosystem to demonstrate an automation aspect
   that is evolving dynamically without human intervention.
