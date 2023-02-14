@@ -8,7 +8,7 @@ As a 2023 ramp up activity, the following shall be accomplished:
   aspects covered.
 * Configure and enable necessary telemetry aspects from monitoring & alerting perspective.
 * Build a representative UI application using Vue.js that will consume these APIs with
-  testablity aspects covered.
+  testablity & telemetry (like clickstream, errors reporting etc) aspects covered.
 * Demonstrate a simple CI/CD pipepline for the ecosystem that promotes everyday or more
   frequent deployments ensuring engineering efficiency is measured through DORA metrics.
 * Apply machine learning algorithms in the ecosystem to demonstrate an automation aspect
