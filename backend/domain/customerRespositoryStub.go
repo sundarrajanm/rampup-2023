@@ -2,7 +2,7 @@ package domain
 
 import (
 	"backend/errs"
-	"log"
+	"backend/logger"
 )
 
 type CustomerRepositoryStub struct {
@@ -19,10 +19,11 @@ func (s CustomerRepositoryStub) ById(id string) (*Customer, *errs.AppError) {
 			"1", "Shankar", "Chennai", "560048", "08-Nov-1983", "Active",
 		}, nil
 	} else if id == "2" {
+		logger.Error("Customer not found for id: " + id)
 		return nil, errs.NewNotFoundError("record not found")
 	} else {
 		errMsg := "connection to upstream failed"
-		log.Println("Error while communicating with DB: " + errMsg)
+		logger.Error("Error while communicating with DB: " + errMsg)
 		return nil, errs.NewUnexpectedError(errMsg)
 	}
 }

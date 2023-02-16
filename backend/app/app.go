@@ -2,8 +2,8 @@ package app
 
 import (
 	"backend/domain"
+	"backend/logger"
 	"backend/service"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,7 +11,7 @@ import (
 )
 
 func Start() {
-	fmt.Println("Starting backend app")
+	logger.Info("Starting backend app")
 
 	router := mux.NewRouter()
 
