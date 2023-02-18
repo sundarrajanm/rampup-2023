@@ -1,5 +1,4 @@
 
-docker run -d -p 3306:3306 --name mysql-docker-container -e MYSQL_ROOT_PASSWORD=sergey -e MYSQL_DATABASE=photo_app -e MYSQL_USER=sergey -e MYSQL_PASSWORD=sergey mysql/mysql-server:latest
 CREATE DATABASE banking;
 USE banking;
 
@@ -44,7 +43,7 @@ CREATE TABLE `transactions` (
     `amount` int(11) NOT NULL,
     `tx_type` varchar(10) NOT NULL,
     `tx_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY_KEY (`tx_id`),
+    PRIMARY KEY (`tx_id`),
     KEY `transactions_FK` (`account_id`),
     CONSTRAINT `transactions_FK` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
