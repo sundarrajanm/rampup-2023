@@ -3,11 +3,11 @@ package domain
 import "backend/errs"
 
 type Customer struct {
-	Id          string
+	Id          string `db:"cust_id"`
 	Name        string
 	City        string
 	Zipcode     string
-	DateofBirth string
+	DateofBirth string `db:"dob"`
 	Status      string
 }
 
