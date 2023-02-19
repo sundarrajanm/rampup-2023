@@ -52,8 +52,9 @@ func Start() {
 
 	// define routes``
 	router.HandleFunc("/customers", ch.getAllCustomers)
-	router.HandleFunc("/customers/{id:[0-9]+}", ch.getCustomer)
-	router.HandleFunc("/customers/{id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", ah.MakeTransaction).Methods(http.MethodPost)
 
 	// Start the server
 	host := os.Getenv(API_ADDR)
