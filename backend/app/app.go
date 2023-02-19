@@ -8,8 +8,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -42,14 +44,37 @@ func Start() {
 
 	// Wiring
 	// ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
-	ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryDB())}
+	dbClient := getDBClient()
+	customerRepositoryDB := domain.NewCustomerRepositoryDB(dbClient)
+	accountRepositoryDB := domain.NewAccountRepositoryDB(dbClient)
+	ch := CustomerHandlers{service.NewCustomerService(customerRepositoryDB)}
+	ah := AccountHandlers{service.NewAccountService(accountRepositoryDB)}
 
 	// define routes``
 	router.HandleFunc("/customers", ch.getAllCustomers)
 	router.HandleFunc("/customers/{id:[0-9]+}", ch.getCustomer)
+	router.HandleFunc("/customers/{id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
 
 	// Start the server
 	host := os.Getenv(API_ADDR)
 	port := os.Getenv(API_PORT)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), router))
+}
+
+func getDBClient() *sqlx.DB {
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWD")
+	host := os.Getenv("DB_ADDR")
+	port := os.Getenv("DB_PORT")
+	db := os.Getenv("DB_NAME")
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, db)
+	client, err := sqlx.Open("mysql", connectionString)
+	if err != nil {
+		panic(err)
+	}
+
+	client.SetConnMaxLifetime(time.Minute * 3)
+	client.SetMaxOpenConns(10)
+	client.SetMaxIdleConns(10)
+	return client
 }

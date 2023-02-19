@@ -25,7 +25,7 @@ CREATE TABLE `accounts` (
     `cust_id` int(11) NOT NULL,
     `opening_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `account_type` varchar(10) NOT NULL,
-    `pin` varchar(10) NOT NULL,
+    `amount` float NOT NULL,
     `status` tinyint(4) NOT NULL DEFAULT '1',
     PRIMARY KEY (`account_id`),
     KEY `accounts_FK` (`cust_id`),
@@ -33,9 +33,9 @@ CREATE TABLE `accounts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=95476 DEFAULT CHARSET=latin1;
 
 INSERT INTO `accounts` VALUES
-    (95470, 2000, '2020-08-22 10:20:06', 'Saving', '1075', 1),
-    (95471, 2001, '2021-08-22 10:20:06', 'Saving', '1076', 1),
-    (95472, 2002, '2022-08-22 10:20:06', 'Checking', '1077', 1);
+    (95470, 2000, '2020-08-22 10:20:06', 'Saving', 6075, 1),
+    (95471, 2001, '2021-08-22 10:20:06', 'Saving', 10076, 1),
+    (95472, 2002, '2022-08-22 10:20:06', 'Checking', 111077, 1);
 
 CREATE TABLE `transactions` (
     `tx_id` int(11) NOT NULL AUTO_INCREMENT,

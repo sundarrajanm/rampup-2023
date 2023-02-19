@@ -4,9 +4,6 @@ import (
 	"backend/errs"
 	"backend/logger"
 	"database/sql"
-	"fmt"
-	"os"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -46,20 +43,6 @@ func (d CustomerRepositoryDB) ById(id string) (*Customer, *errs.AppError) {
 	return &c, nil
 }
 
-func NewCustomerRepositoryDB() CustomerRepositoryDB {
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWD")
-	host := os.Getenv("DB_ADDR")
-	port := os.Getenv("DB_PORT")
-	db := os.Getenv("DB_NAME")
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, db)
-	client, err := sqlx.Open("mysql", connectionString)
-	if err != nil {
-		panic(err)
-	}
-
-	client.SetConnMaxLifetime(time.Minute * 3)
-	client.SetMaxOpenConns(10)
-	client.SetMaxIdleConns(10)
-	return CustomerRepositoryDB{client}
+func NewCustomerRepositoryDB(dbClient *sqlx.DB) CustomerRepositoryDB {
+	return CustomerRepositoryDB{dbClient}
 }

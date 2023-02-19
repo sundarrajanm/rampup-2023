@@ -1,7 +1,7 @@
 package dto
 
 type CustomerResponse struct {
-	Id          string `json:"cust_id"`
+	Id          string `json:"customer_id"`
 	Name        string `json:"name"`
 	City        string `json:"city"`
 	Zipcode     string `json:"zip_code"`
