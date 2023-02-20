@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -37,15 +38,22 @@ func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 
-	if body := response.Body.String(); body != "[]" {
-		t.Errorf("Expected an empty array. Got '%s'", body)
+	var result []any
+	err := json.NewDecoder(response.Body).Decode(&result)
+
+	if err != nil {
+		t.Fatalf("Unable to parse response from server %q into slice of any, '%v'", response.Body, err)
+	}
+
+	if len(result) != 0 {
+		t.Fatalf("Result was not empty, found: '%v'", result)
 	}
 }
 
 /*
 	Remaining tests:
-	0. Return 200 OK on success
-	1. Return empty array
+	0. Return 200 OK on success - DONE
+	1. Return empty array - DONE
 	2. Return a single customer
 	3. Return multiple customer
 	4. Return proper error message when upstream failed
