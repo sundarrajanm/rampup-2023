@@ -1,11 +1,13 @@
 package app
 
 import (
+	"banking-resource-api/service"
 	"encoding/json"
 	"net/http"
 )
 
 type CustomerHandler struct {
+	service service.CustomerService
 }
 
 func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Request) {
@@ -13,5 +15,5 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 	rw.Header().Add("Content-Type", "application/json")
 
 	encoder := json.NewEncoder(rw)
-	encoder.Encode([]any{})
+	encoder.Encode(ch.service.GetAllCustomers())
 }
