@@ -7,14 +7,14 @@ import (
 )
 
 type CustomerHandler struct {
-	service service.CustomerService
+	Service service.CustomerService
 }
 
 func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(200)
 	rw.Header().Add("Content-Type", "application/json")
 
-	customers, appError := ch.service.GetAllCustomers()
+	customers, appError := ch.Service.GetAllCustomers()
 
 	if appError != nil {
 		writeResponse(rw, appError.Code, appError)
@@ -25,6 +25,8 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(code)
+	if code != http.StatusOK {
+		w.WriteHeader(code)
+	}
 	json.NewEncoder(w).Encode(data)
 }

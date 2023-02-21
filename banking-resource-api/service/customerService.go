@@ -14,3 +14,7 @@ type DefaultCustomerService struct{}
 func (d DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError) {
 	return []dto.CustomerResponse{}, nil
 }
+
+func NewCustomerService() DefaultCustomerService {
+	return DefaultCustomerService{}
+}
