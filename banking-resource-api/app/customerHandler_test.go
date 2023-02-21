@@ -21,48 +21,49 @@ func (d DummyCustomerService) GetAllCustomers() []dto.CustomerResponse {
 
 // //////////////////////////////////////////////
 
-func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
+func executeWithMockCustomerServiceResponse(mock func() []dto.CustomerResponse) *httptest.ResponseRecorder {
 	// Arrange
-	getAllCustomersMock := func() []dto.CustomerResponse {
-		return []dto.CustomerResponse{}
-	}
 	router := mux.NewRouter()
-	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
+	ch := CustomerHandler{DummyCustomerService{mock}}
 	router.HandleFunc("/customers", ch.GetAllCustomers)
 	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
 	responseWriter := httptest.NewRecorder()
 
 	// Act
 	router.ServeHTTP(responseWriter, request)
+	return responseWriter
+}
+
+func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
+	// Arrange
+	getAllCustomersMock := func() []dto.CustomerResponse {
+		return []dto.CustomerResponse{}
+	}
+
+	// Act
+	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
 
 	// Assert
-	if responseWriter.Code != http.StatusOK {
-		t.Errorf("Got response code: %d", responseWriter.Code)
+	if response.Code != http.StatusOK {
+		t.Errorf("Got response code: %d", response.Code)
 	}
 }
 
 func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 	// Arrange
+	var result []dto.CustomerResponse
 	getAllCustomersMock := func() []dto.CustomerResponse {
-		return []dto.CustomerResponse{}
+		return result
 	}
-	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
-	router := mux.NewRouter()
-	router.HandleFunc("/customers", ch.GetAllCustomers)
-	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
-	response := httptest.NewRecorder()
 
 	// Act
-	router.ServeHTTP(response, request)
+	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
 
 	// Assert
-	var result []dto.CustomerResponse
 	err := json.NewDecoder(response.Body).Decode(&result)
-
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of any, '%v'", response.Body, err)
 	}
-
 	if len(result) != 0 {
 		t.Fatalf("Result was not empty, found: '%v'", result)
 	}
@@ -73,14 +74,9 @@ func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
 	getAllCustomersMock := func() []dto.CustomerResponse {
 		return []dto.CustomerResponse{{}, {}, {}}
 	}
-	router := mux.NewRouter()
-	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
-	router.HandleFunc("/customers", ch.GetAllCustomers)
-	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
-	response := httptest.NewRecorder()
 
 	// Act
-	router.ServeHTTP(response, request)
+	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
 
 	// Assert
 	var result []dto.CustomerResponse
