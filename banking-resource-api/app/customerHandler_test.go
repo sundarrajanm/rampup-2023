@@ -11,24 +11,23 @@ import (
 )
 
 // //////////// CustomerService Mock ////////////
-
-var getAllCustomersMock func() []dto.CustomerResponse
-
-type DummyCustomerService struct{}
+type DummyCustomerService struct {
+	getAllCustomersMock func() []dto.CustomerResponse
+}
 
 func (d DummyCustomerService) GetAllCustomers() []dto.CustomerResponse {
-	return getAllCustomersMock()
+	return d.getAllCustomersMock()
 }
 
 // //////////////////////////////////////////////
 
 func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
 	// Arrange
-	getAllCustomersMock = func() []dto.CustomerResponse {
+	getAllCustomersMock := func() []dto.CustomerResponse {
 		return []dto.CustomerResponse{}
 	}
 	router := mux.NewRouter()
-	ch := CustomerHandler{DummyCustomerService{}}
+	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
 	router.HandleFunc("/customers", ch.GetAllCustomers)
 	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
 	responseWriter := httptest.NewRecorder()
@@ -44,10 +43,10 @@ func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
 
 func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 	// Arrange
-	getAllCustomersMock = func() []dto.CustomerResponse {
+	getAllCustomersMock := func() []dto.CustomerResponse {
 		return []dto.CustomerResponse{}
 	}
-	ch := CustomerHandler{DummyCustomerService{}}
+	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
 	router := mux.NewRouter()
 	router.HandleFunc("/customers", ch.GetAllCustomers)
 	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
@@ -71,11 +70,11 @@ func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 
 func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
 	// Arrange
-	getAllCustomersMock = func() []dto.CustomerResponse {
+	getAllCustomersMock := func() []dto.CustomerResponse {
 		return []dto.CustomerResponse{{}, {}, {}}
 	}
 	router := mux.NewRouter()
-	ch := CustomerHandler{DummyCustomerService{}}
+	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock}}
 	router.HandleFunc("/customers", ch.GetAllCustomers)
 	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
 	response := httptest.NewRecorder()
