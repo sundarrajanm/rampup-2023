@@ -2,6 +2,7 @@ package app
 
 import (
 	"banking-resource-api/dto"
+	"banking-resource-api/errs"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,16 +13,16 @@ import (
 
 // //////////// CustomerService Mock ////////////
 type DummyCustomerService struct {
-	getAllCustomersMock func() []dto.CustomerResponse
+	getAllCustomersMock func() ([]dto.CustomerResponse, *errs.AppError)
 }
 
-func (d DummyCustomerService) GetAllCustomers() []dto.CustomerResponse {
+func (d DummyCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError) {
 	return d.getAllCustomersMock()
 }
 
 // //////////////////////////////////////////////
 
-func executeWithMockCustomerServiceResponse(mock func() []dto.CustomerResponse) *httptest.ResponseRecorder {
+func executeWithMockCustomerServiceResponse(mock func() ([]dto.CustomerResponse, *errs.AppError)) *httptest.ResponseRecorder {
 	// Arrange
 	router := mux.NewRouter()
 	ch := CustomerHandler{DummyCustomerService{mock}}
@@ -36,8 +37,8 @@ func executeWithMockCustomerServiceResponse(mock func() []dto.CustomerResponse) 
 
 func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
 	// Arrange
-	getAllCustomersMock := func() []dto.CustomerResponse {
-		return []dto.CustomerResponse{}
+	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
+		return []dto.CustomerResponse{}, nil
 	}
 
 	// Act
@@ -52,8 +53,8 @@ func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
 func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 	// Arrange
 	var result []dto.CustomerResponse
-	getAllCustomersMock := func() []dto.CustomerResponse {
-		return result
+	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
+		return result, nil
 	}
 
 	// Act
@@ -71,8 +72,8 @@ func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 
 func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
 	// Arrange
-	getAllCustomersMock := func() []dto.CustomerResponse {
-		return []dto.CustomerResponse{{}, {}, {}}
+	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
+		return []dto.CustomerResponse{{}, {}, {}}, nil
 	}
 
 	// Act
@@ -88,6 +89,32 @@ func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
 
 	if len(result) != 3 {
 		t.Fatalf("Expected 3 customers, found: '%v'", result)
+	}
+}
+
+func Test_When_Service_Failed_Should_Return_AppError(t *testing.T) {
+	// Arrange
+	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	// Act
+	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
+
+	// Assert
+	var errResponse errs.AppError
+	err := json.NewDecoder(response.Body).Decode(&errResponse)
+
+	if err != nil {
+		t.Fatalf("Unable to parse error response from server %q into AppError, '%v'", response.Body, err)
+	}
+
+	if errResponse.Code != 500 {
+		t.Fatalf("Service failure is an internal server error but received: '%v'", errResponse.Code)
+	}
+
+	if errResponse.Message != "Unexpected database error" {
+		t.Fatalf("Service failure message is not correct: '%v'", errResponse.Message)
 	}
 }
 

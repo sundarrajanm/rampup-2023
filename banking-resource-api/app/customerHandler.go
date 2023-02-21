@@ -14,6 +14,17 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 	rw.WriteHeader(200)
 	rw.Header().Add("Content-Type", "application/json")
 
-	encoder := json.NewEncoder(rw)
-	encoder.Encode(ch.service.GetAllCustomers())
+	customers, appError := ch.service.GetAllCustomers()
+
+	if appError != nil {
+		writeResponse(rw, appError.Code, appError)
+	} else {
+		writeResponse(rw, http.StatusOK, customers)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(data)
 }
