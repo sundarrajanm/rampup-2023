@@ -35,7 +35,7 @@ func executeWithMockCustomerServiceResponse(mock func() ([]dto.CustomerResponse,
 	return responseWriter
 }
 
-func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
+func Test_Given_GetAllCustomersRequest_When_Successful_Then_Return200OK_(t *testing.T) {
 	// Arrange
 	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
 		return []dto.CustomerResponse{}, nil
@@ -50,7 +50,7 @@ func Test_When_Successful_Should_Return_200_OK(t *testing.T) {
 	}
 }
 
-func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
+func Test_Given_GetAllCustomersRequest_When_NoCustomers_Then_ReturnEmptyArray(t *testing.T) {
 	// Arrange
 	var result []dto.CustomerResponse
 	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
@@ -70,7 +70,7 @@ func Test_When_NoCustomers_Should_Return_Empty_Array(t *testing.T) {
 	}
 }
 
-func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
+func Test_Given_GetAllCustomersRequest_WhenThereAreCustomers_Then_ReturnArrayOfCustomers(t *testing.T) {
 	// Arrange
 	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
 		return []dto.CustomerResponse{{}, {}, {}}, nil
@@ -92,7 +92,7 @@ func Test_When_Should_Return_Array_With_Customers(t *testing.T) {
 	}
 }
 
-func Test_When_Service_Failed_Should_Return_AppError(t *testing.T) {
+func Test_Given_GetAllCustomersRequest_When_ServiceInternallyFailed_Then_ReturnAppError(t *testing.T) {
 	// Arrange
 	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
 		return nil, errs.NewUnexpectedError("Unexpected database error")
@@ -117,11 +117,3 @@ func Test_When_Service_Failed_Should_Return_AppError(t *testing.T) {
 		t.Fatalf("Service failure message is not correct: '%v'", errResponse.Message)
 	}
 }
-
-/*
-	Remaining tests:
-	0. Return 200 OK on success - DONE
-	1. Return empty array - DONE
-	2. Return customer array on success - DONE
-	3. Return proper error message when upstream failed
-*/

@@ -25,7 +25,7 @@ func VerifyIfRouteAvailable(r Route, router *mux.Router, t *testing.T) {
 	}
 }
 
-func Test_DefaultApplication_Should_Have_GetAllCustomers_Route(t *testing.T) {
+func Test_Given_DefaultApplication_When_RouterIsSetup_Then_GetAllCustomersRouteIsAvailable(t *testing.T) {
 	defaultApp := DefaultApplication{}
 	router := defaultApp.SetupRouter()
 
@@ -42,7 +42,7 @@ func verifyPanic(t *testing.T) {
 	}
 }
 
-func Test_DefaultApplication_Should_ListenAndServe_FromHostPort_Setup_InEnv(t *testing.T) {
+func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHostPortFromOsEnvVars(t *testing.T) {
 	t.Setenv("API_HOST", "localhost")
 	t.Setenv("API_PORT", "8080")
 
@@ -59,6 +59,6 @@ func Test_DefaultApplication_Should_ListenAndServe_FromHostPort_Setup_InEnv(t *t
 	Start(testApp)
 }
 
-// func Test_DefaultApplication_Should_Fail_In_ListenAndServe_WhenHostPort_UnAvailable_InEnv(t *testing.T) {
-
-// }
+func Test_Given_DefaultApplicationWithAPI_HOST_and_API_PORT_missing_When_Started_Then_ItFailsWithDetails(t *testing.T) {
+	t.Fatalf("Not yet implemented")
+}
