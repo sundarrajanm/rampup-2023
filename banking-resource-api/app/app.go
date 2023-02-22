@@ -1,6 +1,7 @@
 package app
 
 import (
+	"banking-resource-api/domain"
 	"banking-resource-api/logger"
 	"banking-resource-api/service"
 	"fmt"
@@ -20,7 +21,7 @@ type DefaultApplication struct {
 }
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
-	ch := CustomerHandler{Service: service.NewCustomerService()}
+	ch := CustomerHandler{Service: service.NewCustomerService(domain.NewCustomerRepository())}
 	const GetAllCustomersRoute = Route(GetAllCustomers)
 
 	router := mux.NewRouter()
