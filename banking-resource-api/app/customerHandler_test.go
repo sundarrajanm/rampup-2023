@@ -109,7 +109,7 @@ func Test_When_Service_Failed_Should_Return_AppError(t *testing.T) {
 		t.Fatalf("Unable to parse error response from server %q into AppError, '%v'", response.Body, err)
 	}
 
-	if errResponse.Code != 500 {
+	if errResponse.Code != http.StatusInternalServerError {
 		t.Fatalf("Service failure is an internal server error but received: '%v'", errResponse.Code)
 	}
 
