@@ -32,11 +32,24 @@ func (a DefaultApplication) SetupRouter() *mux.Router {
 
 func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string, port string) {
 	err := a.ListenAndServe(fmt.Sprintf("%s:%s", host, port), router)
-	logger.Fatal("Exiting server: " + err.Error())
+	logger.Fatal(err.Error())
+}
+
+func checkMandatoryEnvVars(vars ...string) {
+	for _, v := range vars {
+		value := os.Getenv(v)
+		logger.Info("Checking: " + v + ", value: " + value)
+		if value == "" {
+			errMsg := "Env variable " + v + " not found"
+			logger.Error(errMsg)
+			panic(errMsg)
+		}
+	}
 }
 
 func Start(a Application) {
 	fmt.Println("Starting banking resource service")
+	checkMandatoryEnvVars("API_HOST", "API_PORT")
 
 	// Define routes
 	router := a.SetupRouter()

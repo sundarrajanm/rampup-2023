@@ -32,33 +32,76 @@ func Test_Given_DefaultApplication_When_RouterIsSetup_Then_GetAllCustomersRouteI
 	VerifyIfRouteAvailable(Route(GetAllCustomers), router, t)
 }
 
-func DummyListenAndServe(addr string, handler http.Handler) error {
-	return nil
-}
-
 func verifyPanic(t *testing.T) {
 	if r := recover(); r == nil {
-		t.Errorf("The code did not panic")
+		t.Errorf("Panic didn't happen")
 	}
+}
+
+func inducePanicToPreemptOSExit() error {
+	return nil
 }
 
 func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHostPortFromOsEnvVars(t *testing.T) {
 	t.Setenv("API_HOST", "localhost")
 	t.Setenv("API_PORT", "8080")
+	t.Cleanup(func() {
+		t.Setenv("API_HOST", "")
+		t.Setenv("API_PORT", "")
+	})
 
-	defer verifyPanic(t)
+	defer verifyPanic(t) // Needed to recover from inducePanicToPreemptOSExit
 
 	testApp := DefaultApplication{
 		func(addr string, h http.Handler) error {
 			if addr != "localhost:8080" {
-				t.Fatalf("ListenAndServe received: '%v'", addr)
+				t.Errorf("ListenAndServe received: '%v'", addr)
 			}
-			return nil
+			return inducePanicToPreemptOSExit()
 		},
 	}
 	Start(testApp)
 }
 
-func Test_Given_DefaultApplicationWithAPI_HOST_and_API_PORT_missing_When_Started_Then_ItFailsWithDetails(t *testing.T) {
-	t.Fatalf("Not yet implemented")
+func verifyPanicWithMessage(t *testing.T, msg string) {
+	r := recover()
+
+	t.Logf("Panic message: '%v'", r)
+
+	if r == nil {
+		t.Errorf("Panic didn't happen")
+	}
+
+	if r != msg {
+		t.Errorf("Expected: '%v', Received: '%v'", msg, r)
+	}
+}
+
+func Test_Given_DefaultApplicationWithMissingHostEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
+	defer verifyPanicWithMessage(t, "Env variable API_HOST not found")
+
+	testApp := DefaultApplication{
+		func(addr string, h http.Handler) error {
+			return nil
+		},
+	}
+
+	Start(testApp)
+}
+
+func Test_Given_DefaultApplicationWithMissingPortEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
+	t.Setenv("API_HOST", "localhost")
+	t.Cleanup(func() {
+		t.Setenv("API_HOST", "")
+	})
+
+	defer verifyPanicWithMessage(t, "Env variable API_PORT not found")
+
+	testApp := DefaultApplication{
+		func(addr string, h http.Handler) error {
+			return nil
+		},
+	}
+
+	Start(testApp)
 }
