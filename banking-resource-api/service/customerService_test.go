@@ -68,6 +68,6 @@ func Test_GivenGetAllCustomers_WhenFailed_ThenReturn_AppError(t *testing.T) {
 	}
 
 	if err.Message != "Unexpected database error" {
-		t.Errorf("Expected: '%v', Received: '%v'", http.StatusInternalServerError, err.Message)
+		t.Errorf("Expected: 'Unexpected database error', Received: '%v'", err.Message)
 	}
 }
