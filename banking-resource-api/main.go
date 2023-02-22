@@ -2,8 +2,9 @@ package main
 
 import (
 	"banking-resource-api/app"
+	"net/http"
 )
 
 func main() {
-	app.Start(app.DefaultApplication{})
+	app.Start(app.DefaultApplication{ListenAndServe: http.ListenAndServe})
 }

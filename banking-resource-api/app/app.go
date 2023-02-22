@@ -1,10 +1,11 @@
 package app
 
 import (
+	"banking-resource-api/logger"
 	"banking-resource-api/service"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -14,7 +15,9 @@ type Application interface {
 	ListenAndServeRoutes(*mux.Router, string, string)
 }
 
-type DefaultApplication struct{}
+type DefaultApplication struct {
+	ListenAndServe func(string, http.Handler) error
+}
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
 	ch := CustomerHandler{Service: service.NewCustomerService()}
@@ -28,7 +31,8 @@ func (a DefaultApplication) SetupRouter() *mux.Router {
 }
 
 func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string, port string) {
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), router))
+	err := a.ListenAndServe(fmt.Sprintf("%s:%s", host, port), router)
+	logger.Fatal("Exiting server: " + err.Error())
 }
 
 func Start(a Application) {
@@ -38,7 +42,7 @@ func Start(a Application) {
 	router := a.SetupRouter()
 
 	// Start server
-	host := "localhost"
-	port := "8000"
+	host := os.Getenv("API_HOST")
+	port := os.Getenv("API_PORT")
 	a.ListenAndServeRoutes(router, host, port)
 }
