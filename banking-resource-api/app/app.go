@@ -48,7 +48,7 @@ func checkMandatoryEnvVars(vars ...string) {
 }
 
 func Start(a Application) {
-	fmt.Println("Starting banking resource service")
+	logger.Info("Starting banking resource service")
 	checkMandatoryEnvVars("API_HOST", "API_PORT")
 
 	// Define routes
