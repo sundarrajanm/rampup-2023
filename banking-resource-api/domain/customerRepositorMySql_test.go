@@ -69,12 +69,17 @@ func Test_Given_DB_NAME_EnvVar_WhenEmpty_ItPanicsWithCorrectDetails(t *testing.T
 	NewCustomerRepoMySql(nil)
 }
 
-func Test_Given_FindAll_Then_UseMySqlDriver(t *testing.T) {
+func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testing.T) {
 	setAllEnvVars(t)
+	expectedConnectionString := GetConnectionString()
 
 	NewCustomerRepoMySql(func(driver string, connectionString string) (*sqlx.DB, error) {
-		if driver != "mysql" {
-			t.Errorf("Unknown driver used: '%v'", "something")
+		if driver != MySqlDriver {
+			t.Errorf("Expected db driver: '%v', Received: '%v'", MySqlDriver, driver)
+		}
+		if connectionString != expectedConnectionString {
+			t.Errorf("Expected connection string: '%v', Received: '%v'", expectedConnectionString,
+				connectionString)
 		}
 		return nil, nil
 	})
