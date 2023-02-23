@@ -30,3 +30,7 @@ func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	}
 	json.NewEncoder(w).Encode(data)
 }
+
+func NewCustomerHandler(service service.CustomerService) CustomerHandler {
+	return CustomerHandler{Service: service}
+}

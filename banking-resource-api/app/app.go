@@ -18,8 +18,9 @@ type Application interface {
 }
 
 type DefaultApplication struct {
-	ListenAndServe types.HttpListenAndServe
-	OpenSql        types.OpenSqlxDB
+	ListenAndServe  types.HttpListenAndServe
+	OpenSql         types.OpenSqlxDB
+	CustomerHandler CustomerHandler
 }
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
@@ -54,9 +55,12 @@ func Start(a Application) {
 
 func NewDefaultApplication(
 	listenAndServe types.HttpListenAndServe,
-	openSql types.OpenSqlxDB) Application {
+	openSql types.OpenSqlxDB,
+	customerHandler CustomerHandler,
+) Application {
 	return DefaultApplication{
-		ListenAndServe: listenAndServe,
-		OpenSql:        openSql,
+		ListenAndServe:  listenAndServe,
+		OpenSql:         openSql,
+		CustomerHandler: customerHandler,
 	}
 }
