@@ -5,14 +5,21 @@ import (
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 )
 
 const MySqlDriver = "mysql"
 
-type CustomerRepoMySql struct{}
+type CustomerRepoMySql struct {
+	client *sqlx.DB
+}
 
 func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
-	return []Customer{}, nil
+	customers := make([]Customer, 0)
+	d.client.Select(&customers,
+		"select cust_id, name, city, zipcode, dob, status from customers")
+	return customers, nil
 }
 
 func GetConnectionString() string {
@@ -26,6 +33,6 @@ func GetConnectionString() string {
 
 func NewCustomerRepoMySql(openSql types.OpenSqlxDB) CustomerRepository {
 	connectionString := GetConnectionString()
-	openSql("mysql", connectionString)
-	return CustomerRepoMySql{}
+	dbClient, _ := openSql("mysql", connectionString)
+	return CustomerRepoMySql{dbClient}
 }

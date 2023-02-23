@@ -3,6 +3,7 @@ package domain
 import (
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -83,4 +84,23 @@ func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testi
 		}
 		return nil, nil
 	})
+}
+
+func Test_Given_FindAll_WhenNoCustomers_ThenReturnEmptyArray(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery("select cust_id, name, city, zipcode, dob, status from customers").WillReturnRows(
+		&sqlmock.Rows{})
+
+	setAllEnvVars(t)
+	repo := NewCustomerRepoMySql(func(s1, s2 string) (*sqlx.DB, error) { return sqlx.NewDb(db, "mysql"), nil })
+
+	customers, _ := repo.FindAll()
+	if len(customers) != 0 {
+		t.Errorf("Expected: 0, Received: '%d'", len(customers))
+	}
 }
