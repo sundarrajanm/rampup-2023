@@ -6,5 +6,7 @@ import (
 )
 
 func main() {
-	app.Start(app.DefaultApplication{ListenAndServe: http.ListenAndServe})
+	app.Start(
+		app.NewDefaultApplication(http.ListenAndServe),
+	)
 }

@@ -4,6 +4,7 @@ import (
 	"banking-resource-api/domain"
 	"banking-resource-api/logger"
 	"banking-resource-api/service"
+	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
 	"net/http"
@@ -48,4 +49,8 @@ func Start(a Application) {
 	host := os.Getenv("API_HOST")
 	port := os.Getenv("API_PORT")
 	a.ListenAndServeRoutes(router, host, port)
+}
+
+func NewDefaultApplication(listenAndServe types.HttpListenAndServe) Application {
+	return DefaultApplication{ListenAndServe: listenAndServe}
 }
