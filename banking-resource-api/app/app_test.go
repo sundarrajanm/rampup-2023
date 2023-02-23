@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 func VerifyIfRouteAvailable(r Route, router *mux.Router, t *testing.T) {
@@ -42,6 +43,10 @@ func inducePanicToPreemptOSExit() error {
 	return nil
 }
 
+func DummyOpenSql(string, string) (*sqlx.DB, error) {
+	return nil, nil
+}
+
 func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHostPortFromOsEnvVars(t *testing.T) {
 	t.Setenv("API_HOST", "localhost")
 	t.Setenv("API_PORT", "8080")
@@ -58,7 +63,7 @@ func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHost
 				t.Errorf("ListenAndServe received: '%v'", addr)
 			}
 			return inducePanicToPreemptOSExit()
-		},
+		}, DummyOpenSql,
 	}
 	Start(testApp)
 }
@@ -83,7 +88,7 @@ func DummyListenAndServe(addr string, h http.Handler) error {
 func Test_Given_DefaultApplicationWithMissingHostEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
 	defer verifyPanicWithMessage(t, "Env variable API_HOST not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe)
+	testApp := NewDefaultApplication(DummyListenAndServe, DummyOpenSql)
 
 	Start(testApp)
 }
@@ -96,7 +101,7 @@ func Test_Given_DefaultApplicationWithMissingPortEnvVars_When_Started_Then_ItPan
 
 	defer verifyPanicWithMessage(t, "Env variable API_PORT not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe)
+	testApp := NewDefaultApplication(DummyListenAndServe, DummyOpenSql)
 
 	Start(testApp)
 }

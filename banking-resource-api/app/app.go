@@ -7,7 +7,6 @@ import (
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -19,11 +18,13 @@ type Application interface {
 }
 
 type DefaultApplication struct {
-	ListenAndServe func(string, http.Handler) error
+	ListenAndServe types.HttpListenAndServe
+	OpenSql        types.OpenSqlxDB
 }
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
-	ch := CustomerHandler{Service: service.NewCustomerService(domain.NewCustomerRepository())}
+	repo := domain.NewCustomerRepository()
+	ch := CustomerHandler{Service: service.NewCustomerService(repo)}
 	const GetAllCustomersRoute = Route(GetAllCustomers)
 
 	router := mux.NewRouter()
@@ -51,6 +52,11 @@ func Start(a Application) {
 	a.ListenAndServeRoutes(router, host, port)
 }
 
-func NewDefaultApplication(listenAndServe types.HttpListenAndServe) Application {
-	return DefaultApplication{ListenAndServe: listenAndServe}
+func NewDefaultApplication(
+	listenAndServe types.HttpListenAndServe,
+	openSql types.OpenSqlxDB) Application {
+	return DefaultApplication{
+		ListenAndServe: listenAndServe,
+		OpenSql:        openSql,
+	}
 }
