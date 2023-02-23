@@ -86,21 +86,23 @@ func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testi
 	})
 }
 
-func Test_Given_FindAll_WhenNoCustomers_ThenReturnEmptyArray(t *testing.T) {
+func Test_Given_FindAll_WhenCustomersInDB_ThenReturnEmptyOfCustomers(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	mock.ExpectQuery("select cust_id, name, city, zipcode, dob, status from customers").WillReturnRows(
-		&sqlmock.Rows{})
+	rows := sqlmock.NewRows([]string{"cust_id", "name", "city", "zipcode", "dob", "status"}).
+		AddRow("1", "Shankya", "Bengaluru", "560048", "18-02-2010", "1")
+	mock.ExpectQuery("select cust_id, name, city, zipcode, dob, status from customers").
+		WillReturnRows(rows)
 
 	setAllEnvVars(t)
 	repo := NewCustomerRepoMySql(func(s1, s2 string) (*sqlx.DB, error) { return sqlx.NewDb(db, "mysql"), nil })
 
 	customers, _ := repo.FindAll()
-	if len(customers) != 0 {
-		t.Errorf("Expected: 0, Received: '%d'", len(customers))
+	if len(customers) != 1 {
+		t.Errorf("Expected: 1, Received: '%d'", len(customers))
 	}
 }
