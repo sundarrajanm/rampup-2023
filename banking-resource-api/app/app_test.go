@@ -76,15 +76,14 @@ func verifyPanicWithMessage(t *testing.T, msg string) {
 		t.Errorf("Expected: '%v', Received: '%v'", msg, r)
 	}
 }
+func DummyListenAndServe(addr string, h http.Handler) error {
+	return nil
+}
 
 func Test_Given_DefaultApplicationWithMissingHostEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
 	defer verifyPanicWithMessage(t, "Env variable API_HOST not found")
 
-	testApp := DefaultApplication{
-		func(addr string, h http.Handler) error {
-			return nil
-		},
-	}
+	testApp := NewDefaultApplication(DummyListenAndServe)
 
 	Start(testApp)
 }
@@ -97,11 +96,7 @@ func Test_Given_DefaultApplicationWithMissingPortEnvVars_When_Started_Then_ItPan
 
 	defer verifyPanicWithMessage(t, "Env variable API_PORT not found")
 
-	testApp := DefaultApplication{
-		func(addr string, h http.Handler) error {
-			return nil
-		},
-	}
+	testApp := NewDefaultApplication(DummyListenAndServe)
 
 	Start(testApp)
 }

@@ -7,6 +7,8 @@ import (
 
 func main() {
 	app.Start(
-		app.NewDefaultApplication(http.ListenAndServe),
+		app.NewDefaultApplication(
+			http.ListenAndServe,
+		),
 	)
 }
