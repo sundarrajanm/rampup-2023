@@ -21,15 +21,10 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Install dependencies
-      run: |
-        go version
-        go install golang.org/x/lint/golint@latest
-
     - name: Build
       working-directory: ./banking-resource-api    
       run: go build -v ./...
 
     - name: Test With Coverage
       working-directory: ./banking-resource-api
-      run: go test -v -coverprofile=coverage.txt ./...
+      run: go test -coverprofile=coverage.txt ./...
