@@ -4,6 +4,7 @@ import (
 	"banking-resource-api/domain"
 	"banking-resource-api/logger"
 	"banking-resource-api/service"
+	"banking-resource-api/utils"
 	"fmt"
 	"net/http"
 	"os"
@@ -36,21 +37,9 @@ func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string
 	logger.Fatal(err.Error())
 }
 
-func checkMandatoryEnvVars(vars ...string) {
-	for _, v := range vars {
-		value := os.Getenv(v)
-		logger.Info("Checking: " + v + ", value: " + value)
-		if value == "" {
-			errMsg := "Env variable " + v + " not found"
-			logger.Error(errMsg)
-			panic(errMsg)
-		}
-	}
-}
-
 func Start(a Application) {
 	logger.Info("Starting banking resource service")
-	checkMandatoryEnvVars("API_HOST", "API_PORT")
+	utils.CheckMandatoryEnvVars("API_HOST", "API_PORT")
 
 	// Define routes
 	router := a.SetupRouter()
