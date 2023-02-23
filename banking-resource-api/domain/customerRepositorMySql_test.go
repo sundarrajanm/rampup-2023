@@ -86,7 +86,7 @@ func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testi
 	})
 }
 
-func Test_Given_FindAll_WhenCustomersInDB_ThenReturnEmptyOfCustomers(t *testing.T) {
+func Test_Given_FindAll_WhenCustomersInDB_ThenReturnDomainCustomers(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
