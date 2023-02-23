@@ -1,9 +1,7 @@
 package app
 
 import (
-	"banking-resource-api/domain"
 	"banking-resource-api/logger"
-	"banking-resource-api/service"
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
@@ -24,13 +22,11 @@ type DefaultApplication struct {
 }
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
-	repo := domain.NewCustomerRepository()
-	ch := CustomerHandler{Service: service.NewCustomerService(repo)}
 	const GetAllCustomersRoute = Route(GetAllCustomers)
 
 	router := mux.NewRouter()
-	router.HandleFunc(GetAllCustomersRoute.PathTemplate(), ch.GetAllCustomers).
-		Name(GetAllCustomersRoute.Name())
+	router.HandleFunc(GetAllCustomersRoute.PathTemplate(),
+		a.CustomerHandler.GetAllCustomers).Name(GetAllCustomersRoute.Name())
 
 	return router
 }
@@ -55,12 +51,10 @@ func Start(a Application) {
 
 func NewDefaultApplication(
 	listenAndServe types.HttpListenAndServe,
-	openSql types.OpenSqlxDB,
 	customerHandler CustomerHandler,
 ) Application {
 	return DefaultApplication{
 		ListenAndServe:  listenAndServe,
-		OpenSql:         openSql,
 		CustomerHandler: customerHandler,
 	}
 }

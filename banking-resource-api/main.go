@@ -10,20 +10,15 @@ import (
 )
 
 func main() {
-	// Hexagonal Architecture Dependency Injection
-	customerRepo := domain.NewCustomerRepoMySql()
+	// Hexagonal Architecture Dependency Injection In Action
+	customerRepo := domain.NewCustomerRepoMySql(sqlx.Open)
 	customerService := service.NewCustomerService(customerRepo)
 	customerHandler := app.NewCustomerHandler(customerService)
-
-	// 3rd Party Dependency Injection
-	listenAndServe := http.ListenAndServe
-	openSql := sqlx.Open
 
 	// Start the application
 	app.Start(
 		app.NewDefaultApplication(
-			listenAndServe,
-			openSql,
+			http.ListenAndServe, // 3rd party dependency injection
 			customerHandler,
 		),
 	)

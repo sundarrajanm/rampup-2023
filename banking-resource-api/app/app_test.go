@@ -57,14 +57,14 @@ func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHost
 
 	defer verifyPanic(t) // Needed to recover from inducePanicToPreemptOSExit
 
-	testApp := DefaultApplication{
+	testApp := NewDefaultApplication(
 		func(addr string, h http.Handler) error {
 			if addr != "localhost:8080" {
 				t.Errorf("ListenAndServe received: '%v'", addr)
 			}
 			return inducePanicToPreemptOSExit()
-		}, DummyOpenSql, NewCustomerHandler(nil),
-	}
+		}, NewCustomerHandler(nil),
+	)
 	Start(testApp)
 }
 
@@ -88,7 +88,7 @@ func DummyListenAndServe(addr string, h http.Handler) error {
 func Test_Given_DefaultApplicationWithMissingHostEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
 	defer verifyPanicWithMessage(t, "Env variable API_HOST not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe, DummyOpenSql, NewCustomerHandler(nil))
+	testApp := NewDefaultApplication(DummyListenAndServe, NewCustomerHandler(nil))
 
 	Start(testApp)
 }
@@ -101,7 +101,7 @@ func Test_Given_DefaultApplicationWithMissingPortEnvVars_When_Started_Then_ItPan
 
 	defer verifyPanicWithMessage(t, "Env variable API_PORT not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe, DummyOpenSql, NewCustomerHandler(nil))
+	testApp := NewDefaultApplication(DummyListenAndServe, NewCustomerHandler(nil))
 
 	Start(testApp)
 }
