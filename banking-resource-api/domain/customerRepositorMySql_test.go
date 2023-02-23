@@ -2,6 +2,8 @@ package domain
 
 import (
 	"testing"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func verifyPanicWithMessage(t *testing.T, msg string) {
@@ -17,8 +19,7 @@ func verifyPanicWithMessage(t *testing.T, msg string) {
 		t.Errorf("Expected: '%v', Received: '%v'", msg, r)
 	}
 }
-
-func makeEnvVarEmpty(varName string, t *testing.T) {
+func setAllEnvVars(t *testing.T) {
 	t.Setenv("DB_USER", "root")
 	t.Setenv("DB_PASSWORD", "secret")
 	t.Setenv("DB_HOST", "localhost")
@@ -31,6 +32,10 @@ func makeEnvVarEmpty(varName string, t *testing.T) {
 		t.Setenv("DB_PORT", "")
 		t.Setenv("DB_NAME", "")
 	})
+}
+
+func makeEnvVarEmpty(varName string, t *testing.T) {
+	setAllEnvVars(t)
 	t.Setenv(varName, "")
 }
 
@@ -62,4 +67,15 @@ func Test_Given_DB_NAME_EnvVar_WhenEmpty_ItPanicsWithCorrectDetails(t *testing.T
 	defer verifyPanicWithMessage(t, "Env variable DB_NAME not found")
 	makeEnvVarEmpty("DB_NAME", t)
 	NewCustomerRepoMySql(nil)
+}
+
+func Test_Given_FindAll_Then_UseMySqlDriver(t *testing.T) {
+	setAllEnvVars(t)
+
+	NewCustomerRepoMySql(func(driver string, connectionString string) (*sqlx.DB, error) {
+		if driver != "mysql" {
+			t.Errorf("Unknown driver used: '%v'", "something")
+		}
+		return nil, nil
+	})
 }

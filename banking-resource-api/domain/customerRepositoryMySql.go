@@ -2,7 +2,6 @@ package domain
 
 import (
 	"banking-resource-api/errs"
-	"banking-resource-api/logger"
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
@@ -21,7 +20,6 @@ func NewCustomerRepoMySql(openSql types.OpenSqlxDB) CustomerRepository {
 	port := utils.CheckMandatoryEnvVar("DB_PORT")
 	db := utils.CheckMandatoryEnvVar("DB_NAME")
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, db)
-
-	logger.Info("Connection String: " + connectionString)
+	openSql("mysql", connectionString)
 	return CustomerRepoMySql{}
 }
