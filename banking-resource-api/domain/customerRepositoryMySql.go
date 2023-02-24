@@ -7,6 +7,7 @@ import (
 	"banking-resource-api/utils"
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -40,7 +41,7 @@ func GetConnectionString() string {
 
 func NewCustomerRepoMySql(openSql types.OpenSqlxDB) CustomerRepository {
 	connectionString := GetConnectionString()
-	dbClient, err := openSql("mysql", connectionString)
+	dbClient, err := openSql(MySqlDriver, connectionString)
 
 	if err != nil {
 		panic(err.Error())

@@ -24,7 +24,7 @@ func Test_GivenGetAllCustomers_WhenSuccessful_ThenReturn_ArrayOfCustomerResponse
 				City:        "Bengaluru",
 				Zipcode:     "560048",
 				DateofBirth: "01-01-1947",
-				Status:      "active",
+				Status:      "1",
 			}}, nil
 		},
 	})

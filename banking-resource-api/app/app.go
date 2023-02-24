@@ -37,7 +37,7 @@ func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string
 }
 
 func Start(a Application) {
-	logger.Info("Starting banking resource service")
+	logger.Info("Starting banking-resource-api service...")
 	utils.CheckMandatoryEnvVars("API_HOST", "API_PORT")
 
 	// Define routes

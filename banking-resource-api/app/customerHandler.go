@@ -25,9 +25,7 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Add("Content-Type", "application/json")
-	if code != http.StatusOK {
-		w.WriteHeader(code)
-	}
+	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(data)
 }
 
