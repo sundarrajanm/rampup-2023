@@ -27,10 +27,6 @@ func Info(message string, fields ...zap.Field) {
 	log.Info(message, fields...)
 }
 
-func Debug(message string, fields ...zap.Field) {
-	log.Debug(message, fields...)
-}
-
 func Error(message string, fields ...zap.Field) {
 	log.Error(message, fields...)
 }

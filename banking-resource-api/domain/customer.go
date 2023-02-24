@@ -13,7 +13,6 @@ type Customer struct {
 
 func (c Customer) statusAsText() string {
 	statusAsText := "active"
-
 	if c.Status == "0" {
 		statusAsText = "inactive"
 	}

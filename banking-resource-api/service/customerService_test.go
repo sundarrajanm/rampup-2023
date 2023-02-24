@@ -35,6 +35,26 @@ func Test_GivenGetAllCustomers_WhenSuccessful_ThenReturn_ArrayOfCustomerResponse
 	}
 }
 
+func Test_GivenGetAllCustomers_WhenSuccessful_ThenForStatus_0_MapTo_Inactive(t *testing.T) {
+	service := NewCustomerService(DummyTestRepo{
+		getAllCustomersMock: func() ([]domain.Customer, *errs.AppError) {
+			return []domain.Customer{{
+				Id:          "1",
+				Name:        "Test",
+				City:        "Bengaluru",
+				Zipcode:     "560048",
+				DateofBirth: "01-01-1947",
+				Status:      "0",
+			}}, nil
+		},
+	})
+	customers, _ := service.GetAllCustomers()
+
+	if customers[0].Status != "inactive" {
+		t.Errorf("Expected: inactive, Received: '%v'", customers[0].Status)
+	}
+}
+
 func Test_GivenGetAllCustomers_WhenSuccessful_ThenReturn_EmptyCustomerResponseDTO(t *testing.T) {
 	service := NewCustomerService(DummyTestRepo{
 		getAllCustomersMock: func() ([]domain.Customer, *errs.AppError) {
