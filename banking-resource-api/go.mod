@@ -6,6 +6,8 @@ require github.com/gorilla/mux v1.8.0
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/akrylysov/algnhsa v0.12.1 // indirect
+	github.com/aws/aws-lambda-go v1.37.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

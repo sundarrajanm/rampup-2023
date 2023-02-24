@@ -41,15 +41,16 @@ func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string
 }
 
 func Start(a Application) {
-	logger.Info("Starting banking-resource-api service...")
-	utils.CheckMandatoryEnvVars("API_HOST", "API_PORT")
-
-	// Define routes
+	logger.Info("Starting banking-resource-api service")
+	// Define routes and get a Router
 	router := a.SetupRouter()
 
-	// Start server
-	host := os.Getenv("API_HOST")
-	port := os.Getenv("API_PORT")
+	host := ""
+	port := ""
+	if os.Getenv("RUN_AS_LAMBDA") != "true" {
+		host = utils.CheckMandatoryEnvVar("API_HOST")
+		port = utils.CheckMandatoryEnvVar("API_PORT")
+	}
 	a.ListenAndServeRoutes(router, host, port)
 }
 

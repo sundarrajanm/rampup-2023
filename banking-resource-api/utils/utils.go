@@ -16,9 +16,3 @@ func CheckMandatoryEnvVar(v string) string {
 	}
 	return value
 }
-
-func CheckMandatoryEnvVars(vars ...string) {
-	for _, v := range vars {
-		CheckMandatoryEnvVar(v)
-	}
-}
