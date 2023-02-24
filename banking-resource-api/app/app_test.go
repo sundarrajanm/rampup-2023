@@ -26,11 +26,12 @@ func VerifyIfRouteAvailable(r Route, router *mux.Router, t *testing.T) {
 	}
 }
 
-func Test_Given_DefaultApplication_When_RouterIsSetup_Then_GetAllCustomersRouteIsAvailable(t *testing.T) {
+func Test_Given_DefaultApplication_When_RouterIsSetup_Then_RoutesAreAvailable(t *testing.T) {
 	defaultApp := DefaultApplication{}
 	router := defaultApp.SetupRouter()
 
 	VerifyIfRouteAvailable(Route(GetAllCustomers), router, t)
+	VerifyIfRouteAvailable(Route(GetCustomerById), router, t)
 }
 
 func verifyPanic(t *testing.T) {

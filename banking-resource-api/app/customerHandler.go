@@ -20,6 +20,10 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Request) {
+
+}
+
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)

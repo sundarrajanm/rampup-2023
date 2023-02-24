@@ -23,10 +23,14 @@ type DefaultApplication struct {
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
 	const GetAllCustomersRoute = Route(GetAllCustomers)
+	const GetCustomerByIdRoute = Route(GetCustomerById)
 
 	router := mux.NewRouter()
+
 	router.HandleFunc(GetAllCustomersRoute.PathTemplate(),
 		a.CustomerHandler.GetAllCustomers).Name(GetAllCustomersRoute.Name())
+	router.HandleFunc(GetCustomerByIdRoute.PathTemplate(),
+		a.CustomerHandler.GetCustomerById).Name(GetCustomerByIdRoute.Name())
 
 	return router
 }
