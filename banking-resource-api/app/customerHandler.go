@@ -21,7 +21,8 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 }
 
 func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Request) {
-
+	ch.Service.GetCustomerById("")
+	writeResponse(rw, http.StatusOK, "")
 }
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {

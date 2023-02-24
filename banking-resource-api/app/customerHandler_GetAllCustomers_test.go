@@ -14,6 +14,7 @@ import (
 // //////////// CustomerService Mock ////////////
 type DummyCustomerService struct {
 	getAllCustomersMock func() ([]dto.CustomerResponse, *errs.AppError)
+	getCustomerByIdMock func(string) (dto.CustomerResponse, *errs.AppError)
 }
 
 func (d DummyCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError) {
@@ -22,12 +23,20 @@ func (d DummyCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.A
 
 // //////////////////////////////////////////////
 
+func getAllCustomersMockShouldReturn(response []dto.CustomerResponse, err *errs.AppError) func() ([]dto.CustomerResponse, *errs.AppError) {
+	return func() ([]dto.CustomerResponse, *errs.AppError) {
+		return response, err
+	}
+}
+
 func executeWithMockCustomerServiceResponse(mock func() ([]dto.CustomerResponse, *errs.AppError)) *httptest.ResponseRecorder {
 	// Arrange
 	router := mux.NewRouter()
-	ch := CustomerHandler{DummyCustomerService{mock}}
-	router.HandleFunc("/customers", ch.GetAllCustomers)
-	request, _ := http.NewRequest(http.MethodGet, "/customers", nil)
+	ch := CustomerHandler{DummyCustomerService{getAllCustomersMock: mock}}
+
+	route := Route(GetAllCustomers)
+	router.HandleFunc(route.PathTemplate(), ch.GetAllCustomers)
+	request, _ := http.NewRequest(http.MethodGet, route.PathTemplate(), nil)
 	responseWriter := httptest.NewRecorder()
 
 	// Act
@@ -37,12 +46,10 @@ func executeWithMockCustomerServiceResponse(mock func() ([]dto.CustomerResponse,
 
 func Test_Given_GetAllCustomersRequest_When_Successful_Then_Return200OK_(t *testing.T) {
 	// Arrange
-	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
-		return []dto.CustomerResponse{}, nil
-	}
+	mock := getAllCustomersMockShouldReturn([]dto.CustomerResponse{}, nil)
 
 	// Act
-	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
+	response := executeWithMockCustomerServiceResponse(mock)
 
 	// Assert
 	if response.Code != http.StatusOK {
@@ -53,12 +60,10 @@ func Test_Given_GetAllCustomersRequest_When_Successful_Then_Return200OK_(t *test
 func Test_Given_GetAllCustomersRequest_When_NoCustomers_Then_ReturnEmptyArray(t *testing.T) {
 	// Arrange
 	var result []dto.CustomerResponse
-	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
-		return result, nil
-	}
+	mock := getAllCustomersMockShouldReturn(result, nil)
 
 	// Act
-	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
+	response := executeWithMockCustomerServiceResponse(mock)
 
 	// Assert
 	err := json.NewDecoder(response.Body).Decode(&result)
@@ -72,12 +77,10 @@ func Test_Given_GetAllCustomersRequest_When_NoCustomers_Then_ReturnEmptyArray(t 
 
 func Test_Given_GetAllCustomersRequest_WhenThereAreCustomers_Then_ReturnArrayOfCustomers(t *testing.T) {
 	// Arrange
-	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
-		return []dto.CustomerResponse{{}, {}, {}}, nil
-	}
+	mock := getAllCustomersMockShouldReturn([]dto.CustomerResponse{{}, {}, {}}, nil)
 
 	// Act
-	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
+	response := executeWithMockCustomerServiceResponse(mock)
 
 	// Assert
 	var result []dto.CustomerResponse
@@ -100,12 +103,10 @@ func Test_Given_GetAllCustomersRequest_WhenThereAreCustomers_Then_ReturnArrayOfC
 
 func Test_Given_GetAllCustomersRequest_When_ServiceInternallyFailed_Then_ReturnAppError(t *testing.T) {
 	// Arrange
-	getAllCustomersMock := func() ([]dto.CustomerResponse, *errs.AppError) {
-		return nil, errs.NewUnexpectedError("Unexpected database error")
-	}
+	mock := getAllCustomersMockShouldReturn(nil, errs.NewUnexpectedError("Unexpected database error"))
 
 	// Act
-	response := executeWithMockCustomerServiceResponse(getAllCustomersMock)
+	response := executeWithMockCustomerServiceResponse(mock)
 
 	// Assert
 	var errResponse errs.AppError

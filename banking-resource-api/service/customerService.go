@@ -8,6 +8,7 @@ import (
 
 type CustomerService interface {
 	GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError)
+	GetCustomerById(string) (dto.CustomerResponse, *errs.AppError)
 }
 
 type DefaultCustomerService struct {
@@ -25,6 +26,10 @@ func (d DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs
 		customersDTO = append(customersDTO, *c.ToDTO())
 	}
 	return customersDTO, nil
+}
+
+func (d DefaultCustomerService) GetCustomerById(string) (dto.CustomerResponse, *errs.AppError) {
+	return dto.CustomerResponse{}, nil
 }
 
 func NewCustomerService(repo domain.CustomerRepository) DefaultCustomerService {
