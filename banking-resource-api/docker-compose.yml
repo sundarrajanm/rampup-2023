@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.6.27
+    ports:
+      - "127.0.0.1:3306:3306"
+    command: --init-file /data/application/db-init.sql
+    volumes:
+      - ./sql/db-init.sql:/data/application/db-init.sql
+      - mysqldata:/var/li/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
+    container_name: mysql
+    environment:      
+      MYSQL_ROOT_PASSWORD: secret
+      TZ: Asia/Kolkata
+
+volumes:
+  mysqldata:
+    driver: local
+
+      
+      
