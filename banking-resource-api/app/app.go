@@ -5,7 +5,9 @@ import (
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -26,6 +28,9 @@ func (a DefaultApplication) SetupRouter() *mux.Router {
 	const GetCustomerByIdRoute = Route(GetCustomerById)
 
 	router := mux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		writeResponse(w, http.StatusOK, [1]string{"Reached Home, Congratulations"})
+	})
 
 	router.HandleFunc(GetAllCustomersRoute.PathTemplate(),
 		a.CustomerHandler.GetAllCustomers).Name(GetAllCustomersRoute.Name())
@@ -40,10 +45,27 @@ func (a DefaultApplication) ListenAndServeRoutes(router *mux.Router, host string
 	logger.Fatal(err.Error())
 }
 
+func WithLoggingMiddleware(h http.Handler) http.Handler {
+	logFn := func(rw http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		uri := r.RequestURI
+		method := r.Method
+		h.ServeHTTP(rw, r) // serve the original request
+
+		duration := time.Since(start)
+
+		// log request details
+		logger.Info(fmt.Sprintf("Uri: %s, Method: %s, duration: %dms", uri, method, duration.Milliseconds()))
+	}
+	return http.HandlerFunc(logFn)
+}
+
 func Start(a Application) {
 	logger.Info("Starting banking-resource-api service")
 	// Define routes and get a Router
 	router := a.SetupRouter()
+	router.Use(WithLoggingMiddleware)
 
 	host := ""
 	port := ""
