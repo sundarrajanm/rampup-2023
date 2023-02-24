@@ -2,6 +2,7 @@ package domain
 
 import (
 	"banking-resource-api/errs"
+	"banking-resource-api/logger"
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
 	"fmt"
@@ -17,8 +18,14 @@ type CustomerRepoMySql struct {
 
 func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
 	customers := make([]Customer, 0)
-	d.client.Select(&customers,
+
+	err := d.client.Select(&customers,
 		"select cust_id, name, city, zipcode, dob, status from customers")
+	if err != nil {
+		logger.Error("Error while querying database: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
 	return customers, nil
 }
 
@@ -33,6 +40,10 @@ func GetConnectionString() string {
 
 func NewCustomerRepoMySql(openSql types.OpenSqlxDB) CustomerRepository {
 	connectionString := GetConnectionString()
-	dbClient, _ := openSql("mysql", connectionString)
+	dbClient, err := openSql("mysql", connectionString)
+
+	if err != nil {
+		panic(err.Error())
+	}
 	return CustomerRepoMySql{dbClient}
 }

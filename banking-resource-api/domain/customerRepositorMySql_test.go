@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"banking-resource-api/errs"
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -70,7 +72,7 @@ func Test_Given_DB_NAME_EnvVar_WhenEmpty_ItPanicsWithCorrectDetails(t *testing.T
 	NewCustomerRepoMySql(nil)
 }
 
-func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testing.T) {
+func Test_Given_NewCustomerRepoMySql_WhenInstantiated_Then_UseCorrectMySqlDriverAndCorrectConnectionString(t *testing.T) {
 	setAllEnvVars(t)
 	expectedConnectionString := GetConnectionString()
 
@@ -83,6 +85,15 @@ func Test_Given_FindAll_Then_UseMySqlDriver_And_CorrectConnectionString(t *testi
 				connectionString)
 		}
 		return nil, nil
+	})
+}
+
+func Test_Given_FindAll_When_OpenSql_Fails_Then_ItPanicsWithCorrectMessage(t *testing.T) {
+	setAllEnvVars(t)
+	defer verifyPanicWithMessage(t, "Unable to connect to DB")
+
+	NewCustomerRepoMySql(func(driver string, connectionString string) (*sqlx.DB, error) {
+		return nil, errors.New("Unable to connect to DB")
 	})
 }
 
@@ -104,5 +115,25 @@ func Test_Given_FindAll_WhenCustomersInDB_ThenReturnDomainCustomers(t *testing.T
 	customers, _ := repo.FindAll()
 	if len(customers) != 1 {
 		t.Errorf("Expected: 1, Received: '%d'", len(customers))
+	}
+}
+
+func Test_Given_FindAll_WhenQueryFails_ThenItShouldCorrectAppError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery("select cust_id, name, city, zipcode, dob, status from customers").
+		WillReturnError(errors.New("Unable to execute the query"))
+
+	setAllEnvVars(t)
+	repo := NewCustomerRepoMySql(func(s1, s2 string) (*sqlx.DB, error) { return sqlx.NewDb(db, "mysql"), nil })
+
+	expectedAppError := errs.NewUnexpectedError("Unexpected database error")
+	_, appError := repo.FindAll()
+	if *appError != *expectedAppError {
+		t.Errorf("Expected: '%v', Received: '%v'", *expectedAppError, *appError)
 	}
 }
