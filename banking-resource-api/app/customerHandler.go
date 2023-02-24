@@ -11,9 +11,6 @@ type CustomerHandler struct {
 }
 
 func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(200)
-	rw.Header().Add("Content-Type", "application/json")
-
 	customers, appError := ch.Service.GetAllCustomers()
 
 	if appError != nil {

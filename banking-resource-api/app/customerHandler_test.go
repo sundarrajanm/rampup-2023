@@ -84,11 +84,17 @@ func Test_Given_GetAllCustomersRequest_WhenThereAreCustomers_Then_ReturnArrayOfC
 	err := json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		t.Fatalf("Unable to parse response from server %q into slice of any, '%v'", response.Body, err)
+		t.Errorf("Unable to parse response from server %q into slice of any, '%v'", response.Body, err)
 	}
 
 	if len(result) != 3 {
-		t.Fatalf("Expected 3 customers, found: '%v'", result)
+		t.Errorf("Expected 3 customers, found: '%v'", result)
+	}
+
+	expectedContentType := "application/json"
+	actualContentType := response.Result().Header.Get("Content-Type")
+	if actualContentType != expectedContentType {
+		t.Errorf("Expected: '%v', Received: '%v'", expectedContentType, actualContentType)
 	}
 }
 
