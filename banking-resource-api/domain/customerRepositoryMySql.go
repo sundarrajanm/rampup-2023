@@ -5,6 +5,7 @@ import (
 	"banking-resource-api/logger"
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
+	"database/sql"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -30,8 +31,21 @@ func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
 	return customers, nil
 }
 
-func (d CustomerRepoMySql) FindById(string) (*Customer, *errs.AppError) {
-	return nil, nil
+func (d CustomerRepoMySql) FindById(id string) (*Customer, *errs.AppError) {
+	findByIdSql := "select cust_id, name, city, zipcode, dob, status from customers where cust_id = ?"
+	var c Customer
+	err := d.client.Get(&c, findByIdSql, id)
+
+	if err == sql.ErrNoRows {
+		return nil, errs.NewNotFoundError(fmt.Sprintf("Customer with Id: '%s' not found", id))
+	}
+
+	if err != nil {
+		logger.Error("Error while getting customer: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	return &c, nil
 }
 
 func GetConnectionString() string {
