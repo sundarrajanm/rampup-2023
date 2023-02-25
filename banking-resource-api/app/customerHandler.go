@@ -4,6 +4,8 @@ import (
 	"banking-resource-api/service"
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type CustomerHandler struct {
@@ -21,7 +23,10 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 }
 
 func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Request) {
-	customer, appError := ch.Service.GetCustomerById("")
+	vars := mux.Vars(r)
+	id := vars["customer_id"]
+
+	customer, appError := ch.Service.GetCustomerById(id)
 	if appError != nil {
 		writeResponse(rw, appError.Code, appError)
 	}

@@ -16,8 +16,11 @@ func (d DummyCustomerService) GetCustomerById(id string) (*dto.CustomerResponse,
 	return d.getCustomerByIdMock(id)
 }
 
-func getCustomerByIdMockShouldReturn(response *dto.CustomerResponse, err *errs.AppError) func(string) (*dto.CustomerResponse, *errs.AppError) {
-	return func(string) (*dto.CustomerResponse, *errs.AppError) {
+func getCustomerByIdMockShouldReturn(response *dto.CustomerResponse, err *errs.AppError, t *testing.T) func(string) (*dto.CustomerResponse, *errs.AppError) {
+	return func(id string) (*dto.CustomerResponse, *errs.AppError) {
+		if id != CustomerId1000 {
+			t.Errorf("Expected: '%s', Got: '%s'", CustomerId1000, id)
+		}
 		return response, err
 	}
 }
@@ -41,7 +44,7 @@ func executeWithMockGetCustomerById(mock func(string) (*dto.CustomerResponse, *e
 
 func Test_Given_GetCustomerByIdRequest_When_Successful_Then_ReturnCustomerWith200OK(t *testing.T) {
 	expectedCustomerDTO := &dto.CustomerResponse{
-		Id:          "10",
+		Id:          CustomerId1000,
 		Name:        "Bob",
 		City:        "Bangalore",
 		Zipcode:     "560048",
@@ -50,7 +53,7 @@ func Test_Given_GetCustomerByIdRequest_When_Successful_Then_ReturnCustomerWith20
 	}
 
 	// Arrange
-	mock := getCustomerByIdMockShouldReturn(expectedCustomerDTO, nil)
+	mock := getCustomerByIdMockShouldReturn(expectedCustomerDTO, nil, t)
 
 	// Act
 	response := executeWithMockGetCustomerById(mock)
@@ -89,7 +92,7 @@ func Test_Given_GetCustomerByIdRequest_When_ServiceInternallyFailed_Then_Return5
 
 func validateErrorResponse(expectedError errs.AppError, t *testing.T) {
 	// Arrange
-	mock := getCustomerByIdMockShouldReturn(nil, &expectedError)
+	mock := getCustomerByIdMockShouldReturn(nil, &expectedError, t)
 
 	// Act
 	response := executeWithMockGetCustomerById(mock)
