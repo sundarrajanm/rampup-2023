@@ -3,34 +3,32 @@ package service
 import (
 	"banking-resource-api/domain"
 	"banking-resource-api/errs"
+	"testing"
 )
 
 func (d DummyTestRepo) FindById(id string) (*domain.Customer, *errs.AppError) {
 	return d.getCustomerByIdMock(id)
 }
 
-// func Test_GivenGetAllCustomers_WhenSuccessful_ThenReturn_ArrayOfCustomerResponseDTO(t *testing.T) {
-// 	service := NewCustomerService(DummyTestRepo{
-// 		getAllCustomersMock: func() ([]domain.Customer, *errs.AppError) {
-// 			return []domain.Customer{{
-// 				Id:          "1",
-// 				Name:        "Test",
-// 				City:        "Bengaluru",
-// 				Zipcode:     "560048",
-// 				DateofBirth: "01-01-1947",
-// 				Status:      "1",
-// 			}}, nil
-// 		},
-// 	})
-// 	customers, _ := service.GetAllCustomers()
+func Test_GivenGetCustomersById_WhenSuccessful_ThenReturn_CustomerResponseDTO(t *testing.T) {
+	service := NewCustomerService(DummyTestRepo{
+		getCustomerByIdMock: func(string) (*domain.Customer, *errs.AppError) {
+			return &domain.Customer{
+				Id:          "1",
+				Name:        "Test",
+				City:        "Bengaluru",
+				Zipcode:     "560048",
+				DateofBirth: "01-01-1947",
+				Status:      "active",
+			}, nil
+		},
+	})
+	customers, _ := service.GetCustomerById("1000")
 
-// 	if len(customers) != 1 {
-// 		t.Errorf("Expected: 1, Received: '%v'", len(customers))
-// 	}
-// 	if customers[0].Status != "active" {
-// 		t.Errorf("Expected: active, Received: '%v'", customers[0].Status)
-// 	}
-// }
+	if customers == nil {
+		t.Errorf("Expected: customer, Received: nil")
+	}
+}
 
 // func Test_GivenGetAllCustomers_WhenSuccessful_ThenForStatus_0_MapTo_Inactive(t *testing.T) {
 // 	service := NewCustomerService(DummyTestRepo{
