@@ -18,7 +18,6 @@ type CustomerRepoMySql struct {
 }
 
 func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
-	logger.Info("Enter CustomerRepoMySql: FindAll")
 	customers := make([]Customer, 0)
 
 	err := d.client.Select(&customers,
@@ -28,7 +27,6 @@ func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
 		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
 
-	logger.Info("Exiting CustomerRepoMySql: FindAll")
 	return customers, nil
 }
 

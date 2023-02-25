@@ -14,7 +14,7 @@ import (
 // //////////// CustomerService Mock ////////////
 type DummyCustomerService struct {
 	getAllCustomersMock func() ([]dto.CustomerResponse, *errs.AppError)
-	getCustomerByIdMock func(string) (dto.CustomerResponse, *errs.AppError)
+	getCustomerByIdMock func(string) (*dto.CustomerResponse, *errs.AppError)
 }
 
 func (d DummyCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError) {

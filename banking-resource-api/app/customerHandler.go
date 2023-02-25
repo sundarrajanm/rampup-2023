@@ -1,7 +1,6 @@
 package app
 
 import (
-	"banking-resource-api/logger"
 	"banking-resource-api/service"
 	"encoding/json"
 	"net/http"
@@ -12,7 +11,6 @@ type CustomerHandler struct {
 }
 
 func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Request) {
-	logger.Info("Enter CustomerHandler: GetAllCustomers")
 	customers, appError := ch.Service.GetAllCustomers()
 
 	if appError != nil {
@@ -20,12 +18,14 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 	} else {
 		writeResponse(rw, http.StatusOK, customers)
 	}
-	logger.Info("Exit CustomerHandler: GetAllCustomers")
 }
 
 func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Request) {
-	ch.Service.GetCustomerById("")
-	writeResponse(rw, http.StatusOK, "")
+	customer, appError := ch.Service.GetCustomerById("")
+	if appError != nil {
+		writeResponse(rw, appError.Code, appError)
+	}
+	writeResponse(rw, http.StatusOK, customer)
 }
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {

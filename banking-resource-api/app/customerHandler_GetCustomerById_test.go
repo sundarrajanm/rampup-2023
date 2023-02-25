@@ -3,6 +3,8 @@ package app
 import (
 	"banking-resource-api/dto"
 	"banking-resource-api/errs"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,24 +12,26 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (d DummyCustomerService) GetCustomerById(id string) (dto.CustomerResponse, *errs.AppError) {
+func (d DummyCustomerService) GetCustomerById(id string) (*dto.CustomerResponse, *errs.AppError) {
 	return d.getCustomerByIdMock(id)
 }
 
-func getCustomerByIdMockShouldReturn(response dto.CustomerResponse, err *errs.AppError) func(string) (dto.CustomerResponse, *errs.AppError) {
-	return func(string) (dto.CustomerResponse, *errs.AppError) {
+func getCustomerByIdMockShouldReturn(response *dto.CustomerResponse, err *errs.AppError) func(string) (*dto.CustomerResponse, *errs.AppError) {
+	return func(string) (*dto.CustomerResponse, *errs.AppError) {
 		return response, err
 	}
 }
 
-func executeWithMockGetCustomerById(mock func(string) (dto.CustomerResponse, *errs.AppError)) *httptest.ResponseRecorder {
+const CustomerId1000 = "1000"
+
+func executeWithMockGetCustomerById(mock func(string) (*dto.CustomerResponse, *errs.AppError)) *httptest.ResponseRecorder {
 	// Arrange
 	router := mux.NewRouter()
 	ch := CustomerHandler{DummyCustomerService{getCustomerByIdMock: mock}}
 
 	route := Route(GetCustomerById)
 	router.HandleFunc(route.PathTemplate(), ch.GetCustomerById)
-	request, _ := http.NewRequest(http.MethodGet, "/customers/1000", nil)
+	request, _ := http.NewRequest(http.MethodGet, "/customers/"+CustomerId1000, nil)
 	responseWriter := httptest.NewRecorder()
 
 	// Act
@@ -35,20 +39,73 @@ func executeWithMockGetCustomerById(mock func(string) (dto.CustomerResponse, *er
 	return responseWriter
 }
 
-func Test_Given_GetCustomerByIdRequest_When_Successful_Then_Return200OK_(t *testing.T) {
+func Test_Given_GetCustomerByIdRequest_When_Successful_Then_ReturnCustomerWith200OK(t *testing.T) {
+	expectedCustomerDTO := &dto.CustomerResponse{
+		Id:          "10",
+		Name:        "Bob",
+		City:        "Bangalore",
+		Zipcode:     "560048",
+		DateofBirth: "10-10-1978",
+		Status:      "active",
+	}
+
 	// Arrange
-	mock := getCustomerByIdMockShouldReturn(dto.CustomerResponse{}, nil)
+	mock := getCustomerByIdMockShouldReturn(expectedCustomerDTO, nil)
 
 	// Act
 	response := executeWithMockGetCustomerById(mock)
 
 	// Assert
 	if response.Code != http.StatusOK {
-		t.Errorf("Got response code: %d", response.Code)
+		t.Errorf("expected: 200, receieved: %d", response.Code)
 	}
 
 	contentTypeHeader := response.Result().Header.Get("Content-Type")
 	if contentTypeHeader != "application/json" {
 		t.Errorf("Content-Type was not application/json, received: %s", contentTypeHeader)
+	}
+
+	var result dto.CustomerResponse
+	err := json.NewDecoder(response.Body).Decode(&result)
+	if err != nil {
+		t.Errorf("Response Body JSON parsing failed")
+	}
+
+	if result != *expectedCustomerDTO {
+		t.Errorf(fmt.Sprintf("Expected Body: '%v', Received: '%v'", expectedCustomerDTO,
+			result))
+	}
+}
+
+func Test_Given_GetCustomerByIdRequest_When_NotFound_Then_Return404(t *testing.T) {
+	expectedErrorResponse := errs.NewNotFoundError("Customer with Id " + CustomerId1000 + " not found")
+
+	// Arrange
+	mock := getCustomerByIdMockShouldReturn(nil, expectedErrorResponse)
+
+	// Act
+	response := executeWithMockGetCustomerById(mock)
+
+	// Assert
+	if response.Code != http.StatusNotFound {
+		t.Errorf("expected: 404, receieved: %d", response.Code)
+	}
+
+	contentTypeHeader := response.Result().Header.Get("Content-Type")
+	if contentTypeHeader != "application/json" {
+		t.Errorf("Content-Type was not application/json, received: %s", contentTypeHeader)
+	}
+
+	// Assert
+	var errResponse errs.AppError
+	err := json.NewDecoder(response.Body).Decode(&errResponse)
+
+	if err != nil {
+		t.Fatalf("Unable to parse error response from server %q into AppError, '%v'", response.Body, err)
+	}
+
+	if errResponse != *expectedErrorResponse {
+		t.Errorf(fmt.Sprintf("Expected Body: '%v', Received: '%v'", *expectedErrorResponse,
+			errResponse))
 	}
 }
