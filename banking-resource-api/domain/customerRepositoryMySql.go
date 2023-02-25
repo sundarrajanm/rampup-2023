@@ -30,6 +30,10 @@ func (d CustomerRepoMySql) FindAll() ([]Customer, *errs.AppError) {
 	return customers, nil
 }
 
+func (d CustomerRepoMySql) FindById(string) (*Customer, *errs.AppError) {
+	return nil, nil
+}
+
 func GetConnectionString() string {
 	user := utils.CheckMandatoryEnvVar("DB_USER")
 	password := utils.CheckMandatoryEnvVar("DB_PASSWORD")

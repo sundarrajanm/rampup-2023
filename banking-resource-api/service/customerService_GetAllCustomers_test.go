@@ -9,6 +9,7 @@ import (
 
 type DummyTestRepo struct {
 	getAllCustomersMock func() ([]domain.Customer, *errs.AppError)
+	getCustomerByIdMock func(string) (*domain.Customer, *errs.AppError)
 }
 
 func (d DummyTestRepo) FindAll() ([]domain.Customer, *errs.AppError) {
@@ -32,6 +33,9 @@ func Test_GivenGetAllCustomers_WhenSuccessful_ThenReturn_ArrayOfCustomerResponse
 
 	if len(customers) != 1 {
 		t.Errorf("Expected: 1, Received: '%v'", len(customers))
+	}
+	if customers[0].Status != "active" {
+		t.Errorf("Expected: active, Received: '%v'", customers[0].Status)
 	}
 }
 
