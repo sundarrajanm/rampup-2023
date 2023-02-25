@@ -14,6 +14,9 @@ functions:
     events:
       - http:
           path: /
-          method: post
+          method: ANY
           cors: true
-          private: false
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
