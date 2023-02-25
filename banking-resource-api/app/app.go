@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -32,6 +33,11 @@ func (a DefaultApplication) SetupRouter() *mux.Router {
 		a.CustomerHandler.GetAllCustomers).Name(GetAllCustomersRoute.Name())
 	router.HandleFunc(GetCustomerByIdRoute.PathTemplate(),
 		a.CustomerHandler.GetCustomerById).Name(GetCustomerByIdRoute.Name())
+
+	// documentation for developers
+	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.SwaggerUI(opts, nil)
+	router.Handle("/docs", sh)
 
 	return router
 }

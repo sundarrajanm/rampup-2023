@@ -2,8 +2,14 @@ package errs
 
 import "net/http"
 
+// swagger:model AppError
 type AppError struct {
-	Code    int    `json:"code"`
+	// Error code usually maps to the HTTP error code
+	// in: int64
+	Code int `json:"code"`
+
+	// Message of the error
+	// in: string
 	Message string `json:"message"`
 }
 

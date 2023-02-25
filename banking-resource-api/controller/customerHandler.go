@@ -1,3 +1,13 @@
+//	Comapany RampUp2023:
+//	 version: 0.0.1
+//	 title: Ramp Up and Learn in 2023
+//	Schemes: http, https
+//	Host: localhost:8000
+//	BasePath: /
+//	Produces:
+//	  - application/json
+//
+// swagger:meta
 package controller
 
 import (
@@ -12,6 +22,13 @@ type CustomerHandler struct {
 	Service service.CustomerService
 }
 
+// swagger:route GET /customers
+// Get customers list
+//
+// responses:
+//
+//	500: errs.AppError
+//	200: []dto.CustomerResponse
 func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Request) {
 	customers, appError := ch.Service.GetAllCustomers()
 
@@ -22,6 +39,14 @@ func (ch CustomerHandler) GetAllCustomers(rw http.ResponseWriter, r *http.Reques
 	}
 }
 
+// swagger:route  GET /customers/{id}
+// Get a customer
+//
+// responses:
+//
+//	404: errs.AppError
+//	500: errs.AppError
+//	200: dto.CustomerResponse
 func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["customer_id"]
