@@ -79,16 +79,24 @@ func Test_Given_GetCustomerByIdRequest_When_Successful_Then_ReturnCustomerWith20
 
 func Test_Given_GetCustomerByIdRequest_When_NotFound_Then_Return404(t *testing.T) {
 	expectedErrorResponse := errs.NewNotFoundError("Customer with Id " + CustomerId1000 + " not found")
+	validateErrorResponse(*expectedErrorResponse, t)
+}
 
+func Test_Given_GetCustomerByIdRequest_When_ServiceInternallyFailed_Then_Return500(t *testing.T) {
+	expectedErrorResponse := errs.NewUnexpectedError("Unexpected database error")
+	validateErrorResponse(*expectedErrorResponse, t)
+}
+
+func validateErrorResponse(expectedError errs.AppError, t *testing.T) {
 	// Arrange
-	mock := getCustomerByIdMockShouldReturn(nil, expectedErrorResponse)
+	mock := getCustomerByIdMockShouldReturn(nil, &expectedError)
 
 	// Act
 	response := executeWithMockGetCustomerById(mock)
 
 	// Assert
-	if response.Code != http.StatusNotFound {
-		t.Errorf("expected: 404, receieved: %d", response.Code)
+	if response.Code != expectedError.Code {
+		t.Errorf("expected: '%d', received: '%d'", expectedError.Code, response.Code)
 	}
 
 	contentTypeHeader := response.Result().Header.Get("Content-Type")
@@ -96,7 +104,6 @@ func Test_Given_GetCustomerByIdRequest_When_NotFound_Then_Return404(t *testing.T
 		t.Errorf("Content-Type was not application/json, received: %s", contentTypeHeader)
 	}
 
-	// Assert
 	var errResponse errs.AppError
 	err := json.NewDecoder(response.Body).Decode(&errResponse)
 
@@ -104,8 +111,7 @@ func Test_Given_GetCustomerByIdRequest_When_NotFound_Then_Return404(t *testing.T
 		t.Fatalf("Unable to parse error response from server %q into AppError, '%v'", response.Body, err)
 	}
 
-	if errResponse != *expectedErrorResponse {
-		t.Errorf(fmt.Sprintf("Expected Body: '%v', Received: '%v'", *expectedErrorResponse,
-			errResponse))
+	if errResponse != expectedError {
+		t.Errorf(fmt.Sprintf("Expected Body: '%v', Received: '%v'", expectedError, errResponse))
 	}
 }
