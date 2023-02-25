@@ -28,8 +28,14 @@ func (d DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs
 	return customersDTO, nil
 }
 
-func (d DefaultCustomerService) GetCustomerById(string) (*dto.CustomerResponse, *errs.AppError) {
-	return &dto.CustomerResponse{}, nil
+func (d DefaultCustomerService) GetCustomerById(id string) (*dto.CustomerResponse, *errs.AppError) {
+	customer, appError := d.repo.FindById(id)
+
+	if appError != nil {
+		return nil, appError
+	}
+
+	return customer.ToDTO(), nil
 }
 
 func NewCustomerService(repo domain.CustomerRepository) DefaultCustomerService {
