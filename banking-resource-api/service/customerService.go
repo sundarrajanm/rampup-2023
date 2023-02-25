@@ -4,6 +4,7 @@ import (
 	"banking-resource-api/domain"
 	"banking-resource-api/dto"
 	"banking-resource-api/errs"
+	"banking-resource-api/logger"
 )
 
 type CustomerService interface {
@@ -16,6 +17,7 @@ type DefaultCustomerService struct {
 }
 
 func (d DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError) {
+	logger.Info("Enter DefaultCustomerService: GetAllCustomers")
 	customers, err := d.repo.FindAll()
 	if err != nil {
 		return nil, err
@@ -25,6 +27,7 @@ func (d DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, *errs
 	for _, c := range customers {
 		customersDTO = append(customersDTO, *c.ToDTO())
 	}
+	logger.Info("Exiting DefaultCustomerService: GetAllCustomers")
 	return customersDTO, nil
 }
 

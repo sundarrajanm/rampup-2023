@@ -62,14 +62,16 @@ func WithLoggingMiddleware(h http.Handler) http.Handler {
 }
 
 func Start(a Application) {
-	logger.Info("Starting banking-resource-api service")
+	RunAsLambda := os.Getenv("RUN_AS_LAMBDA")
+	logger.Info("Starting banking-resource-api service as a lambda: " + RunAsLambda)
+
 	// Define routes and get a Router
 	router := a.SetupRouter()
 	router.Use(WithLoggingMiddleware)
 
 	host := ""
 	port := ""
-	if os.Getenv("RUN_AS_LAMBDA") != "true" {
+	if RunAsLambda != "true" {
 		host = utils.CheckMandatoryEnvVar("API_HOST")
 		port = utils.CheckMandatoryEnvVar("API_PORT")
 	}
