@@ -1,4 +1,4 @@
-package app
+package controller
 
 import (
 	"banking-resource-api/dto"

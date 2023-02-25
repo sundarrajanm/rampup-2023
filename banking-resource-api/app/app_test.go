@@ -1,6 +1,7 @@
 package app
 
 import (
+	"banking-resource-api/controller"
 	"net/http"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func VerifyIfRouteAvailable(r Route, router *mux.Router, t *testing.T) {
+func VerifyIfRouteAvailable(r controller.Route, router *mux.Router, t *testing.T) {
 	route := router.GetRoute(r.Name())
 
 	if route == nil {
@@ -30,8 +31,8 @@ func Test_Given_DefaultApplication_When_RouterIsSetup_Then_RoutesAreAvailable(t 
 	defaultApp := DefaultApplication{}
 	router := defaultApp.SetupRouter()
 
-	VerifyIfRouteAvailable(Route(GetAllCustomers), router, t)
-	VerifyIfRouteAvailable(Route(GetCustomerById), router, t)
+	VerifyIfRouteAvailable(controller.Route(controller.GetAllCustomers), router, t)
+	VerifyIfRouteAvailable(controller.Route(controller.GetCustomerById), router, t)
 }
 
 func verifyPanic(t *testing.T) {
@@ -64,7 +65,7 @@ func Test_Given_DefaultApplication_When_Started_Then_ListenAndServeShouldUseHost
 				t.Errorf("ListenAndServe received: '%v'", addr)
 			}
 			return inducePanicToPreemptOSExit()
-		}, NewCustomerHandler(nil),
+		}, controller.NewCustomerHandler(nil),
 	)
 	Start(testApp)
 }
@@ -89,7 +90,7 @@ func DummyListenAndServe(addr string, h http.Handler) error {
 func Test_Given_DefaultApplicationWithMissingHostEnvVars_When_Started_Then_ItPanicsWithCorrectDetails(t *testing.T) {
 	defer verifyPanicWithMessage(t, "Env variable API_HOST not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe, NewCustomerHandler(nil))
+	testApp := NewDefaultApplication(DummyListenAndServe, controller.NewCustomerHandler(nil))
 
 	Start(testApp)
 }
@@ -102,7 +103,7 @@ func Test_Given_DefaultApplicationWithMissingPortEnvVars_When_Started_Then_ItPan
 
 	defer verifyPanicWithMessage(t, "Env variable API_PORT not found")
 
-	testApp := NewDefaultApplication(DummyListenAndServe, NewCustomerHandler(nil))
+	testApp := NewDefaultApplication(DummyListenAndServe, controller.NewCustomerHandler(nil))
 
 	Start(testApp)
 }

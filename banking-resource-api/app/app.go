@@ -1,6 +1,7 @@
 package app
 
 import (
+	"banking-resource-api/controller"
 	"banking-resource-api/logger"
 	"banking-resource-api/types"
 	"banking-resource-api/utils"
@@ -18,12 +19,12 @@ type Application interface {
 type DefaultApplication struct {
 	ListenAndServe  types.HttpListenAndServe
 	OpenSql         types.OpenSqlxDB
-	CustomerHandler CustomerHandler
+	CustomerHandler controller.CustomerHandler
 }
 
 func (a DefaultApplication) SetupRouter() *mux.Router {
-	const GetAllCustomersRoute = Route(GetAllCustomers)
-	const GetCustomerByIdRoute = Route(GetCustomerById)
+	const GetAllCustomersRoute = controller.Route(controller.GetAllCustomers)
+	const GetCustomerByIdRoute = controller.Route(controller.GetCustomerById)
 
 	router := mux.NewRouter()
 
@@ -58,7 +59,7 @@ func Start(a Application) {
 
 func NewDefaultApplication(
 	listenAndServe types.HttpListenAndServe,
-	customerHandler CustomerHandler,
+	customerHandler controller.CustomerHandler,
 ) Application {
 	return DefaultApplication{
 		ListenAndServe:  listenAndServe,

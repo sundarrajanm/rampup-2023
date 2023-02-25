@@ -1,4 +1,4 @@
-package app
+package controller
 
 import (
 	"banking-resource-api/service"
@@ -29,8 +29,9 @@ func (ch CustomerHandler) GetCustomerById(rw http.ResponseWriter, r *http.Reques
 	customer, appError := ch.Service.GetCustomerById(id)
 	if appError != nil {
 		writeResponse(rw, appError.Code, appError)
+	} else {
+		writeResponse(rw, http.StatusOK, customer)
 	}
-	writeResponse(rw, http.StatusOK, customer)
 }
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {
