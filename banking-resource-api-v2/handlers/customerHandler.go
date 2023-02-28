@@ -10,8 +10,9 @@ type CustomerHandler struct {
 	service service.CustomerService
 }
 
-func (c CustomerHandler) GetAllCustomers(ctx *fiber.Ctx) error {
-	return ctx.SendStatus(400)
+func (ch CustomerHandler) GetAllCustomers(ctx *fiber.Ctx) error {
+	customers, _ := ch.service.GetAllCustomers()
+	return ctx.JSON(customers)
 }
 
 func NewCustomerHandler(service service.CustomerService) CustomerHandler {
